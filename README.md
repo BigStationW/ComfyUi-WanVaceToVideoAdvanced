@@ -12,7 +12,8 @@ Here's how the strength now behaves with these new settings
 - Using a high strength setting (e.g., strength = 1) helps preserve the character's appearance from the reference image, but it often makes the video too rigid and less responsive to the prompt.
   
 That's why using a dynamic strength strikes a balance between having a good prompt understanding and maintaining the character's likeness.
-![ezgif-24e5ff49fbb270](https://github.com/user-attachments/assets/4d305c12-df33-40c9-b0fc-58c425737ec9)
+
+![ezgif-20e4452739f7de-FINAL](https://github.com/user-attachments/assets/aa8f5096-abd6-4158-9757-d550b9894af6)
 
 ## 3) Install
 Navigate to the **ComfyUI/custom_nodes** folder and run the following command in your terminal:
