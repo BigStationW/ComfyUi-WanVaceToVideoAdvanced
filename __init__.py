@@ -9,31 +9,28 @@ import comfy.conds
 import logging
 
 # Script parameter to control logging visibility
-ENABLE_LOGGING = False  # Set to True/False to enable/disable all WanVaceDebug logs
-
-def debug_log(message):
-    """Conditional logging function"""
-    if ENABLE_LOGGING:
-        logging.info(message)
+ENABLE_LOGGING = True  # Set to True/False to enable/disable all WanVaceDebug logs
 
 class WanVaceToVideoAdvanced:
     @classmethod
     def INPUT_TYPES(s):
         return {"required": {"model": ("MODEL",),
-                             "positive": ("CONDITIONING", ),
-                             "negative": ("CONDITIONING", ),
-                             "vae": ("VAE", ),
-                             "width": ("INT", {"default": 832, "min": 16, "max": nodes.MAX_RESOLUTION, "step": 16}),
-                             "height": ("INT", {"default": 480, "min": 16, "max": nodes.MAX_RESOLUTION, "step": 16}),
-                             "length": ("INT", {"default": 81, "min": 1, "max": nodes.MAX_RESOLUTION, "step": 4}),
-                             "batch_size": ("INT", {"default": 1, "min": 1, "max": 4096}),
-                             "strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1000.0, "step": 0.01}),
-                             "start_percent": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
-                             "end_percent": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                            "positive": ("CONDITIONING", ),
+                            "negative": ("CONDITIONING", ),
+                            "vae": ("VAE", ),
+                            "width": ("INT", {"default": 832, "min": 16, "max": nodes.MAX_RESOLUTION, "step": 16}),
+                            "height": ("INT", {"default": 480, "min": 16, "max": nodes.MAX_RESOLUTION, "step": 16}),
+                            "length": ("INT", {"default": 81, "min": 1, "max": nodes.MAX_RESOLUTION, "step": 4}),
+                            "batch_size": ("INT", {"default": 1, "min": 1, "max": 4096}),
+                            "strength_inside": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1000.0, "step": 0.01}),
+                            "strength_outside": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1000.0, "step": 0.01}),
+                            "start_percent": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                            "end_percent": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
+                            "enable_console_logging": ("BOOLEAN", {"default": False}),
                 },
                 "optional": {"control_video": ("IMAGE", ),
-                             "control_masks": ("MASK", ),
-                             "reference_image": ("IMAGE", ),
+                            "control_masks": ("MASK", ),
+                            "reference_image": ("IMAGE", ),
                 }}
 
     RETURN_TYPES = ("MODEL", "CONDITIONING", "CONDITIONING", "LATENT", "INT")
@@ -42,15 +39,25 @@ class WanVaceToVideoAdvanced:
 
     CATEGORY = "conditioning/video_models"
 
-    def encode(self, model, positive, negative, vae, width, height, length, batch_size, strength, start_percent, end_percent, control_video=None, control_masks=None, reference_image=None):
+    def encode(self, model, positive, negative, vae, width, height, length, batch_size, 
+            strength_inside, strength_outside, start_percent, end_percent, 
+            enable_console_logging=False,  # Add this parameter
+            control_video=None, control_masks=None, reference_image=None):
+        
+        # Create a local debug function that uses the parameter
+        def debug_log(message):
+            """Conditional logging function"""
+            if enable_console_logging:
+                logging.info(message)
         
         params = {
-            "strength": strength,
+            "strength_inside": strength_inside,
+            "strength_outside": strength_outside,
             "start_percent": start_percent,
             "end_percent": end_percent
         }
         
-        debug_log(f"[WanVaceDebug] Initial parameters - Strength: {params['strength']}, Start: {params['start_percent']}, End: {params['end_percent']}")
+        debug_log(f"[WanVaceDebug] Initial parameters - Strength Inside: {params['strength_inside']}, Strength Outside: {params['strength_outside']}, Start: {params['start_percent']}, End: {params['end_percent']}")
         
         # Clone the model
         cloned_model = model.clone() if hasattr(model, 'clone') else model
@@ -134,18 +141,19 @@ class WanVaceToVideoAdvanced:
                     # Calculate percentage based on step index
                     current_step_info["percent"] = current_step_index / schedule_indices if schedule_indices > 0 else 0.0
                     
-                    # Calculate effective strength using params dictionary
+                    # Calculate effective strength using params dictionary with inside/outside logic
                     tolerance = 1e-5
-                    should_apply = (current_step_info["percent"] >= params["start_percent"] - tolerance) and \
-                                (current_step_info["percent"] <= params["end_percent"] + tolerance)
+                    is_inside_range = (current_step_info["percent"] >= params["start_percent"] - tolerance) and \
+                                     (current_step_info["percent"] <= params["end_percent"] + tolerance)
                     
                     # Handle edge cases for exact 0.0 and 1.0
                     if params["start_percent"] == 0.0 and current_step_index == 0:
-                        should_apply = True
+                        is_inside_range = True
                     if params["end_percent"] == 1.0 and current_step_index == schedule_indices:
-                        should_apply = True
+                        is_inside_range = True
                     
-                    current_step_info["effective_strength"] = params["strength"] if should_apply else 0.0
+                    # Use strength_inside when inside range, strength_outside when outside
+                    current_step_info["effective_strength"] = params["strength_inside"] if is_inside_range else params["strength_outside"]
 
         # Store the original CFG function
         original_cfg_function = None
@@ -209,6 +217,17 @@ class WanVaceToVideoAdvanced:
                     vace_strength_modified = torch.full((x.shape[0],), effective_strength, 
                                                     device=x.device, 
                                                     dtype=x.dtype)
+                
+                # Determine if we're inside or outside the range for logging
+                tolerance = 1e-5
+                is_inside_range = (current_percent >= params["start_percent"] - tolerance) and \
+                                 (current_percent <= params["end_percent"] + tolerance)
+                if params["start_percent"] == 0.0 and current_step_index == 0:
+                    is_inside_range = True
+                if params["end_percent"] == 1.0 and current_step_index == schedule_indices:
+                    is_inside_range = True
+                
+                range_status = "INSIDE" if is_inside_range else "OUTSIDE"
                 
                 debug_log(f"[WanVaceDebug] forward_orig: Step: {current_step_index}/{schedule_indices}, "
                             f"Percent: {current_percent:.3f}, "
@@ -297,8 +316,9 @@ class WanVaceToVideoAdvanced:
 
         mask = mask.unsqueeze(0)
 
-        positive = node_helpers.conditioning_set_values(positive, {"vace_frames": [control_video_latent], "vace_mask": [mask], "vace_strength": [strength]}, append=True)
-        negative = node_helpers.conditioning_set_values(negative, {"vace_frames": [control_video_latent], "vace_mask": [mask], "vace_strength": [strength]}, append=True)
+        # Use strength_inside for the conditioning (this is the baseline strength value)
+        positive = node_helpers.conditioning_set_values(positive, {"vace_frames": [control_video_latent], "vace_mask": [mask], "vace_strength": [strength_inside]}, append=True)
+        negative = node_helpers.conditioning_set_values(negative, {"vace_frames": [control_video_latent], "vace_mask": [mask], "vace_strength": [strength_inside]}, append=True)
 
         latent = torch.zeros([batch_size, control_video_latent.shape[1], latent_length, height // 8, width // 8], device=comfy.model_management.intermediate_device())
         out_latent = {"samples": latent}
