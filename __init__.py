@@ -8,9 +8,6 @@ import comfy.clip_vision
 import comfy.conds
 import logging
 
-# Script parameter to control logging visibility
-ENABLE_LOGGING = True  # Set to True/False to enable/disable all WanVaceDebug logs
-
 class WanVaceToVideoAdvanced:
     @classmethod
     def INPUT_TYPES(s):
