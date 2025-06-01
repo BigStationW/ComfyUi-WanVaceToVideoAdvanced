@@ -2,15 +2,17 @@
 
 ## 1) Intro
 WanVaceToVideoAdvanced makes the Strength effect dynamic through time, this node:
-- Adds additional “start_percent” and “end_percent” parameters to the WanVaceToVideo node
-- Change "Strength" to "Strength_inside" and "Strength_outside"
+- Adds additional “start_percent” and “end_percent” parameters
+- Change "Strength" into "Strength_inside" and "Strength_outside"
 
 Here's how the strength now behaves with these new settings
 <img src="https://github.com/user-attachments/assets/f0f20bc7-493e-4432-8bce-0bb3751ec3ff" width="600" />
 
 ## 2) Use case
-- Going for a high strength (e.g. strength = 1) provides a strong character's likelihood, but it makes the video too rigid and it doesn't follow the prompts anymore.
-This is why having a dynamic strength can strike a balance between prompt understanding and character's likelihood
+- Using a high strength setting (e.g., strength = 1) helps preserve the character's appearance from the reference image, but it often makes the video too rigid and less responsive to the prompt.
+  
+That's why using a dynamic strength strikes a balance between a good prompt understanding and maintaining the character's likeness.
+![ezgif-24e5ff49fbb270](https://github.com/user-attachments/assets/4d305c12-df33-40c9-b0fc-58c425737ec9)
 
 ## 3) Install
 Navigate to the **ComfyUI/custom_nodes** folder and run the following command in your terminal:
@@ -18,8 +20,8 @@ Navigate to the **ComfyUI/custom_nodes** folder and run the following command in
 ```git clone https://github.com/BigStationW/ComfyUi-RescaleCFGAdvanced```
 
 ## 4) Usage
-- Use this [workflow](https://github.com/comfyanonymous/ComfyUI_examples/blob/master/wan/vace_reference_to_video.json)
+- Use this [official workflow](https://github.com/comfyanonymous/ComfyUI_examples/blob/master/wan/vace_reference_to_video.json)
 - Replace WanVaceToVideo by WanVaceToVideoAdvanced
 
-<img src="https://github.com/user-attachments/assets/0a1ea498-33f7-46ff-b435-22a1a2959c15" width="400" />
+<img src="https://github.com/user-attachments/assets/cf4dc31a-e56d-4b43-abf6-8ecfc2f2fc30" width="400" />
 
