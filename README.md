@@ -3,7 +3,7 @@
 ## 1) Intro
 WanVaceToVideoAdvanced makes the Strength effect dynamic through time, this node:
 - Adds additional “start_percent” and “end_percent” parameters
-- Change "Strength" into "Strength_inside" and "Strength_outside"
+- Changes "Strength" into "Strength_inside" and "Strength_outside"
 
 Here's how the strength now behaves with these new settings.
 
