@@ -12,4 +12,5 @@ Navigate to the **ComfyUI/custom_nodes** folder and run the following command in
 - Use this [workflow](https://github.com/comfyanonymous/ComfyUI_examples/blob/master/wan/vace_reference_to_video.json)
 - Replace WanVaceToVideo by WanVaceToVideoAdvanced
 
-![image](https://github.com/user-attachments/assets/0a1ea498-33f7-46ff-b435-22a1a2959c15)
+<img src="https://github.com/user-attachments/assets/0a1ea498-33f7-46ff-b435-22a1a2959c15" width="400" />
+
