@@ -11,7 +11,7 @@ Here's how the strength now behaves with these new settings
 ## 2) Use case
 - Using a high strength setting (e.g., strength = 1) helps preserve the character's appearance from the reference image, but it often makes the video too rigid and less responsive to the prompt.
   
-That's why using a dynamic strength strikes a balance between a good prompt understanding and maintaining the character's likeness.
+That's why using a dynamic strength strikes a balance between having a good prompt understanding and maintaining the character's likeness.
 ![ezgif-24e5ff49fbb270](https://github.com/user-attachments/assets/4d305c12-df33-40c9-b0fc-58c425737ec9)
 
 ## 3) Install
