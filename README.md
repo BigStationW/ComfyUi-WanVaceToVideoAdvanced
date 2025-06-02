@@ -19,7 +19,7 @@ That's why using a dynamic strength strikes a balance between having a good prom
 ## 3) Install
 Navigate to the **ComfyUI/custom_nodes** folder and run the following command in your terminal:
 
-```git clone https://github.com/BigStationW/ComfyUi-RescaleCFGAdvanced```
+```git clone https://github.com/BigStationW/ComfyUi-WanVaceToVideoAdvanced```
 
 ## 4) Usage
 - Use this [official workflow](https://github.com/comfyanonymous/ComfyUI_examples/blob/master/wan/vace_reference_to_video.json)
